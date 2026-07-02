@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión Académica de Estudiantes</title>
+
+  <!-- Tipografías: una serif para títulos (carácter institucional) y una sans para datos (legibilidad) utilizando una google apis-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- =====================================================================
+       ENCABEZADO DE LA APLICACIÓN
+       Solo se muestra dentro del "portal" (menú, formulario, listado).
+       Permanece oculto mientras el usuario está en la portada.
+       ===================================================================== -->
+  <header class="encabezado" id="encabezadoApp" hidden>
+    <p class="encabezado__sello" aria-hidden="true">BA</p>
+    <hgroup class="encabezado__titulos">
+      <h1 class="encabezado__titulo">Registro Académico de Estudiantes</h1>
+      <p class="encabezado__subtitulo">Coordinación Académica · Colegio Buenos dias alegres</p>
+    </hgroup>
+    <p class="encabezado__contador" id="contadorEstudiantes">0 estudiantes registrados</p>
+  </header>
+
+  <main>
+
+    <!-- =====================================================================
+         PÁGINA 1 · PORTADA
+         Nombre de la aplicación y botón de ingreso al portal.
+         ===================================================================== -->
+    <section class="vista vista--portada" id="vistaPortada">
+      <p class="portada__sello" aria-hidden="true">BA</p>
+      <hgroup class="portada__titulos">
+        <h1>Registro Académico de Estudiantes</h1>
+        <p>Plataforma de la coordinación académica para administrar la información básica de los estudiantes, sin bases de datos ni frameworks.</p>
+      </hgroup>
+      <button type="button" class="boton boton--primario boton--grande" id="botonIngresar">Ingresar al sistema</button>
+    </section>
+
+    <!-- =====================================================================
+         PÁGINA 2 · MENÚ PRINCIPAL
+         Las opciones de la aplicación se presentan como botones.
+         ===================================================================== -->
+    <section class="vista vista--menu" id="vistaMenu" hidden aria-labelledby="tituloMenu">
+      <h2 id="tituloMenu" class="vista__titulo">¿Qué deseas hacer?</h2>
+
+      <menu class="menu-principal">
+        <li><button type="button" class="boton boton--opcion" data-destino="formulario">Registrar estudiante</button></li>
+        <li><button type="button" class="boton boton--opcion" data-destino="listado">Consultar, editar o eliminar estudiantes</button></li>
+        <li><button type="button" class="boton boton--opcion boton--opcion-secundaria" id="botonVolverPortada">Salir al inicio</button></li>
+      </menu>
+    </section>
+
+    <!-- =====================================================================
+         PÁGINA 3 · FORMULARIO (sirve tanto para registrar como para editar)
+         ===================================================================== -->
+    <section class="vista panel" id="vistaFormulario" hidden aria-labelledby="tituloFormulario">
+      <nav class="vista__nav" aria-label="Navegación del formulario">
+        <button type="button" class="boton boton--texto" data-destino="menu">← Volver al menú</button>
+      </nav>
+
+      <h2 id="tituloFormulario" class="panel__titulo">Datos del estudiante</h2>
+
+      <form id="formEstudiante" novalidate>
+        <!-- Campo oculto: guarda si estamos editando y qué documento se está editando -->
+        <input type="hidden" id="modoEdicion" value="">
+
+        <p class="campo">
+          <label for="documento">Documento</label>
+          <input type="text" id="documento" inputmode="numeric" placeholder="Ej: 1098765432" autocomplete="off">
+          <span class="campo__ayuda" id="ayudaDocumento">Solo números. No se puede repetir ni editar luego.</span>
+        </p>
+
+        <p class="campo">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" placeholder="Ej: Carlos Julio Portilla" autocomplete="off">
+          <span class="campo__ayuda" id="ayudaNombre"></span>
+        </p>
+
+        <p class="campo">
+          <label for="programa">Programa académico</label>
+          <input type="text" id="programa" placeholder="Ej: Ingeniería de Software" autocomplete="off">
+          <span class="campo__ayuda" id="ayudaPrograma"></span>
+        </p>
+
+        <fieldset class="campo-grupo">
+          <legend>Notas (escala 0.0 a 5.0)</legend>
+
+          <p class="campo campo--nota">
+            <label for="nota1">Nota 1</label>
+            <input type="number" id="nota1" step="0.1" min="0" max="5" placeholder="0.0 - 5.0">
+          </p>
+          <p class="campo campo--nota">
+            <label for="nota2">Nota 2</label>
+            <input type="number" id="nota2" step="0.1" min="0" max="5" placeholder="0.0 - 5.0">
+          </p>
+          <p class="campo campo--nota">
+            <label for="nota3">Nota 3</label>
+            <input type="number" id="nota3" step="0.1" min="0" max="5" placeholder="0.0 - 5.0">
+          </p>
+        </fieldset>
+        <span class="campo__ayuda" id="ayudaNotas">Cada nota debe estar entre 0.0 y 5.0.</span>
+
+        <!-- Vista previa de la nota definitiva calculada en tiempo real -->
+        <p class="vista-previa" id="vistaPrevia">
+          <span>Nota definitiva: <strong id="previaDefinitiva">—</strong></span>
+          <span class="estado-pill" id="previaEstado">Sin calcular</span>
+        </p>
+
+        <p class="mensaje-formulario" id="mensajeFormulario" role="alert"></p>
+
+        <menu class="acciones-formulario">
+          <li><button type="submit" class="boton boton--primario" id="botonGuardar">Registrar estudiante</button></li>
+          <li><button type="button" class="boton boton--secundario" id="botonCancelar" hidden>Cancelar edición</button></li>
+        </menu>
+      </form>
+    </section>
+
+    <!-- =====================================================================
+         PÁGINA 4 · LISTADO (consultar, buscar, editar y eliminar)
+         ===================================================================== -->
+    <section class="vista panel" id="vistaListado" hidden aria-labelledby="tituloListado">
+      <nav class="vista__nav" aria-label="Navegación del listado">
+        <button type="button" class="boton boton--texto" data-destino="menu">← Volver al menú</button>
+      </nav>
+
+      <header class="panel__cabecera">
+        <h2 id="tituloListado" class="panel__titulo">Estudiantes registrados</h2>
+
+        <search class="buscador">
+          <input type="text" id="buscarDocumento" inputmode="numeric" placeholder="Buscar por documento…">
+          <menu class="buscador__acciones">
+            <li><button type="button" class="boton boton--secundario" id="botonBuscar">Buscar</button></li>
+            <li><button type="button" class="boton boton--texto" id="botonLimpiarBusqueda">Ver todos</button></li>
+          </menu>
+        </search>
+      </header>
+
+      <p class="mensaje-busqueda" id="mensajeBusqueda"></p>
+
+      <figure class="tabla-envoltorio">
+        <table class="tabla" id="tablaEstudiantes">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre</th>
+              <th>Programa</th>
+              <th>Nota definitiva</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla">
+            <!-- Las filas se generan dinámicamente desde script.js -->
+          </tbody>
+        </table>
+
+        <figcaption class="tabla-vacia" id="tablaVacia">Aún no hay estudiantes registrados. Usa la opción "Registrar estudiante" del menú para agregar el primero.</figcaption>
+      </figure>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    Los datos se almacenan únicamente en la memoria del navegador (arreglos de JavaScript). Si recargas la página, la información se reinicia.
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
