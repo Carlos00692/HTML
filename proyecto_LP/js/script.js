@@ -308,7 +308,7 @@ function renderizarTabla(lista) {
   });
 
   contadorEstudiantes.textContent =
-    estudiantes.length === 1 ? '1 estudiante registrado' : `${estudiantes.length} estudiantes registrados`;
+    estudiantes.length === 1 ? '1 alumno registrado correctamente' : `${estudiantes.length} alumnos registrados correctamente`;
 }
 
 /**
